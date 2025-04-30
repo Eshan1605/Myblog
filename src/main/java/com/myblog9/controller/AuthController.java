@@ -46,8 +46,8 @@ public class AuthController {
     private JwtTokenProvider tokenProvider;
 
 
-    //http://localhost:8080/api/auth
-    @PostMapping
+    //http://localhost:8080/api/auth/signup
+    @PostMapping("/signup")
     public ResponseEntity<?> createUser(@RequestBody SignUpDto signupdto){
 
         if(userrepo.existsByUsername(signupdto.getUsername())){
@@ -80,6 +80,7 @@ public class AuthController {
         return new ResponseEntity<>(dto,HttpStatus.CREATED);
     }
 
+    //http://localhost:8080/api/auth/signin
     @PostMapping("/signin")
     public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto logindto){
 

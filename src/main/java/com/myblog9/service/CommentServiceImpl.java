@@ -4,13 +4,16 @@ import com.myblog9.entity.Comments;
 import com.myblog9.entity.Post;
 import com.myblog9.exception.ResourceNotFound;
 import com.myblog9.payload.CommentDto;
+import com.myblog9.payload.CommentResponse;
 import com.myblog9.repository.CommentRepository;
 import com.myblog9.repository.PostRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -78,10 +81,23 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public List<CommentDto> getAllComments() {
-        List<Comments> comments = commentrepo.findAll();
-       List<CommentDto> alldto = comments.stream().map(c->mapToDto(c)).collect(Collectors.toList());
-        return alldto;
+    public CommentResponse getAllComments(
+            int pageno, int pagesize, String sortby, String sortdir) {
+        Sort sort = sortdir.equalsIgnoreCase(
+                Sort.Direction.ASC.name())?Sort.by(sortby).ascending():Sort.by(sortby).descending();
+        Pageable pageable = PageRequest.of(pageno,pagesize,sort);
+        Page<Comments> all = commentrepo.findAll(pageable);
+        List<Comments> comments = all.getContent();
+        List<CommentDto> alldto = comments.stream().map(c->mapToDto(c)).collect(Collectors.toList());
+        CommentResponse response = new CommentResponse();
+
+       response.setContent(alldto);
+       response.setPageno(all.getNumber());
+       response.setPagesize(all.getSize());
+       response.setTotalelement((int)all.getTotalElements());
+       response.setTotalpages(all.getTotalPages());
+       response.setLast(all.isLast());
+       return response;
     }
 
     CommentDto mapToDto(Comments comment){

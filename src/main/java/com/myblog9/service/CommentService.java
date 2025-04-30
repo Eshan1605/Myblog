@@ -1,6 +1,7 @@
 package com.myblog9.service;
 
 import com.myblog9.payload.CommentDto;
+import com.myblog9.payload.CommentResponse;
 
 import java.util.List;
 
@@ -13,5 +14,5 @@ public interface CommentService {
 
     CommentDto getCommentById(long id);
 
-    List<CommentDto> getAllComments();
+    CommentResponse getAllComments(int pageno, int pagesize, String sortby, String sortdir);
 }

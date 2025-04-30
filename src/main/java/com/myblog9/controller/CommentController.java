@@ -1,12 +1,11 @@
 package com.myblog9.controller;
 
 import com.myblog9.payload.CommentDto;
+import com.myblog9.payload.CommentResponse;
 import com.myblog9.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -21,7 +20,7 @@ public class CommentController {
     //http://localhost:8080/api/comments/{postid}
     @PostMapping("{postid}")
     public ResponseEntity<CommentDto> saveComment
-    (@PathVariable long postid,@RequestBody CommentDto commentdto){
+    (@PathVariable ("postid") long postid,@RequestBody CommentDto commentdto){
 
         CommentDto saveddto = commentservice.saveComment(postid,commentdto);
         return new ResponseEntity<>(saveddto, HttpStatus.CREATED);
@@ -50,10 +49,15 @@ public class CommentController {
        return new ResponseEntity<>(getdto,HttpStatus.OK);
     }
 
-    //http://localhost:8080/api/comments
+    //http://localhost:8080/api/comments?pageno=1&pagesize=4&sortby=title&sortdir=ASC/DESC
     @GetMapping
-    public ResponseEntity<List<CommentDto>> getAllComments(){
-        List<CommentDto> alldtos = commentservice.getAllComments();
-        return new ResponseEntity<>(alldtos,HttpStatus.OK);
+    public CommentResponse getAllComments(
+            @RequestParam(value="pageno",defaultValue ="0",required = false) int pageno,
+            @RequestParam(value="pagesize",defaultValue = "4",required = false) int pagesize,
+            @RequestParam(value="sortby",defaultValue="id",required=false) String sortby,
+            @RequestParam(value="sortdir",defaultValue = "asc",required = false) String sortdir){
+
+        CommentResponse response = commentservice.getAllComments(pageno,pagesize,sortby,sortdir);
+        return response;
     }
 }
